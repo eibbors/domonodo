@@ -1,0 +1,21 @@
+{
+  "author": "Robert Saunders <eibbors@gmail.com>",
+  "name": "domonodo",
+  "description": "API client library for working with Domo.com's 2016 data and user APIs",
+  "version": "0.0.1",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/eibbors/domonodo.git"
+  },
+  "main": "lib/index.js",
+  "engines": {
+    "node": ">= 0.8.0"
+  },
+  "dependencies": {
+    "request": "^2.69.0"
+  },
+  "devDependencies": {
+    "coffee-script": "^1.10.0"
+  },
+  "keywords": ["domo", "domo.com", "dataset"]
+}
