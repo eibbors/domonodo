@@ -20,15 +20,15 @@ It can currently get you an authorization token and use that to execute some of 
     	clientSecret: '<your clientSecret>'
     };
 
-    // Create a new UserClient 
-    var du = new domo.UserClient(credentials);
-    // Authorize our client
-    du.getToken({}, function(err, res, body) {
-    	du.listUsers(function(err, res, body) {
-    		// log our users
-    		console.log(body);
-    	});
-    });
+	// Create a new UserClient 
+	var du = new domo.UserClient(credentials);
+	// Authorize our client
+	du.getToken({}, function(err, res, body) {
+	    du.listUsers({}, function(err, res, body) {
+	        // log our users
+	        console.log(body);
+	    });
+	});
 
 ## Credits
 
