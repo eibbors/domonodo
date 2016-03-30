@@ -4,6 +4,7 @@ domonodo
 `domonodo` is a work-in-progress library for working with Domo.com's User and Data APIs.
 
 ## Version
+0.0.3 - CSV/JSON parse bugfix
 0.0.2 - Implemented Domo's Data APIs and did some preliminary testing on most of the functions
 0.0.1 - Implemented basic Authorization and User APIs
 
