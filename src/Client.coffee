@@ -1,9 +1,7 @@
-# This module contains the base DomoClient class that implements basic authorization support used by the 
-#   more specific API client subclasses.
 request = require 'request'
 
 class DomoClient
-	constructor: (options={}) ->
+  constructor: (options={}) ->
     @clientId = options.clientId ? null
     @clientSecret = options.clientSecret ? null
     @accessToken = options.accessToken ? null
@@ -11,10 +9,9 @@ class DomoClient
 
   # Request an access token for making calls to Domo APIs 
   getToken: (options={}, callback) ->
-    # If the clientId / clientSecret / scope are provided, then update stored values
-    if options.clientId? then @clientId = options.clientId 
-    if options.clientSecret? then @clientSecret = options.clientSecret
-    if options.scope? then @scope = options.scope
+    # If the clientId / clientSecret are provided, then update stored values
+    if options.clientId? then @clientId = clientId 
+    if options.clientSecret? then @clientSecret = clientSecret
 
     # Set up our token request options
     req = 
@@ -22,7 +19,7 @@ class DomoClient
       uri: 'https://api.domo.com/oauth/token'
       qs: 
         grant_type: 'client_credentials'
-        scope: @scope
+        scope: options.scope ? @scope
       auth:
         user: @clientId
         pass: @clientSecret
@@ -35,7 +32,7 @@ class DomoClient
         error = body
       callback error, response, body
 
-  # Simple wrapper function providing JSON parsing and auth configuration
+  # Simple wrapper function providing basic response parsing and auth configuration
   request: (options={}, callback) ->
     # Allow passing in a URI as a string to options parameter
     if typeof options is 'string'
@@ -48,7 +45,13 @@ class DomoClient
     # Submit the request
     request options, (error, response, body) =>
       if error then return callback error, response, body
-      body = JSON.parse(body)
+      if options.headers?.accept is 'text/csv' then
+        # Parse CSV files?
+      else
+        try 
+          body = JSON.parse(body)
+        catch e
+          # Handle JSON parsing error?
       callback null, response, body
 
 module.exports = DomoClient
