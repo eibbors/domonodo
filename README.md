@@ -1,11 +1,11 @@
 domonodo
 ========
 
-`domonodo` is a work-in-progress implementation of the Domo.com's User and Dataset APIs.
-It can currently get you an authorization token and use that to execute some of the User API requests.
+`domonodo` is a work-in-progress library for working with Domo.com's User and Data APIs.
 
 ## Version
-0.0.1
+0.0.2 - Implemented Domo's Data APIs and did some preliminary testing on most of the functions
+0.0.1 - Implemented basic Authorization and User APIs
 
 ## Installation
 
@@ -21,12 +21,31 @@ It can currently get you an authorization token and use that to execute some of 
     };
 
 	// Create a new UserClient 
-	var du = new domo.UserClient(credentials);
+	var duc = new domo.UserClient(credentials);
 	// Authorize our client
-	du.getToken({}, function(err, res, body) {
-	    du.listUsers({}, function(err, res, body) {
-	        // log our users
+	duc.getToken({}, function(err, res, body) {
+		// List our Domo users
+	    duc.listUsers({}, function(err, res, body) {
 	        console.log(body);
+	    });
+	});
+
+	// Create a new DataClient
+	var ddc = new domo.DataClient(credentials);
+	// Authorize our client
+	ddc.getToken({}, function(err, res, body) {
+		// List 10 datasets
+	    ddc.listDataSets({ sort: 'name', fields: 'all', offset: '0', limit: 10 }, function(err, res, body) {
+	    	// Grab the first id returned (you would usually want to validate the results a bit)
+	    	var dsid = body[0].id
+	    	// Retrieve the metadata for the first dataset id
+	    	ddc.getDataSet(dsid, {}, function(err, res, body) {
+	        	console.log(body);
+	    	});
+	    	// Download the dataset in CSV format (can be a lot of data, beware!)
+	    	ddc.pullData(dsid, {}, function(err, res, body) {
+	        	console.log(body);
+	    	});
 	    });
 	});
 

@@ -1,8 +1,8 @@
 {
   "author": "Robert Saunders <eibbors@gmail.com>",
   "name": "domonodo",
-  "description": "API client library for working with Domo.com's 2016 data and user APIs",
-  "version": "0.0.1",
+  "description": "API client library for working with Domo.com's 2016 Data and User APIs",
+  "version": "0.0.2",
   "repository": {
     "type": "git",
     "url": "https://github.com/eibbors/domonodo.git"

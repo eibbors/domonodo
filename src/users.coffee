@@ -1,4 +1,3 @@
-request = require 'request'
 DomoClient = require './Client'
 
 # Client for working with Domo's User APIs
@@ -8,10 +7,10 @@ class DomoUserClient extends DomoClient
     super(options)
 
   # Retrieve a list of users tied to your account instance. available options:
-  #   sort:
-  #   fields:
-  #   page:
-  #   entries:
+  #   sort: The DataSet field to sort by. Fields prefixed with a negative sign reverses the sort (i.e. '-name' does a reverse sort by the name of the DataSets)
+  #   fields: Partial response filter. This allows you to control the amount of data returned.
+  #   page: Page number to retrieve
+  #   entries: Number of entries per page to retrieve
   listUsers: (options={}, callback) ->
     req =
       method: 'GET'
