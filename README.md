@@ -44,7 +44,7 @@ domonodo
 	        	console.log(body);
 	    	});
 	    	// Download the dataset in CSV format (can be a lot of data, beware!)
-	    	ddc.pullData(dsid, {}, function(err, res, body) {
+	    	ddc.pullData(dsid, function(err, res, body) {
 	        	console.log(body);
 	    	});
 	    });
