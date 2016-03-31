@@ -50,6 +50,8 @@ class DomoClient
       else
         try 
           body = JSON.parse(body)
+          # Some HTTP errors come in as parsable objects, so check for that
+          if body.toe? then return callback body, response, body
         catch e
           # Handle JSON parsing error?
       callback null, response, body
