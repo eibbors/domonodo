@@ -7,5 +7,5 @@ module.exports =
 	Client: Client
 	User: users.User
 	UserClient: users.UserClient
-	DataSetMetaData: datasets.DataSetMetaData
+	DataSet: datasets.DataSetMetaData
 	DataClient: datasets.DataClient

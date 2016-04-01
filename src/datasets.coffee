@@ -1,4 +1,5 @@
 DomoClient = require './Client'
+csv = require 'csv'
 
 # Column data types
 DOMO_COLUMN_TYPES = 
@@ -90,7 +91,7 @@ class DomoDataClient extends DomoClient
 
     @request req, (error, response, body) =>
       if error then return callback error, response, body
-      metadata = new DomoDataSetMetaData(body)
+      metadata = new DomoDataSet(body)
       callback error, response, metadata
 
   # List metadata for multiple datasets tied to your account instance. Available options:
@@ -112,7 +113,7 @@ class DomoDataClient extends DomoClient
       if error then return callback error, response, body
       dslist = []
       for dataset in body
-        dslist.push new DomoDataSetMetaData(dataset)
+        dslist.push new DomoDataSet(dataset)
       callback error, response, dslist
 
   # Pull rows from a dataset in CSV format
@@ -126,24 +127,49 @@ class DomoDataClient extends DomoClient
 
     @request req, (error, response, body) =>
       if error then return callback error, response, body
-      callback error, response, body
+      csv.parse body, (error, data) =>
+        callback error, response, data, body
 
   # Push rows to a dataset in CSV format. Available options:
   #   append: Instructions to append or replace uploaded data in a DataSet (default is 'append=false' or to replace data)
-  pushData: (id, options={}, callback) ->
-    if typeof(id) is 'object' and id.id? then id = id.id # Support passing dataset objects
+  pushData: (id, append, data, callback) ->
+    # If they pass an object instead of an id, assume it's a dataset
+    if typeof(id) is 'object'
+      dataset = id
+      if dataset.id? then id = id.id 
+      # If they didn't pass data in, then use the dataset's toCSV to stringify its data
+      if typeof(data) is 'function'
+        callback = data
+        if dataset.toCSV? 
+          return dataset.toCSV (error, str) =>
+            @pushData dataset, append, str, callback 
+      # Support passing a dataset in the data field, as well
+      else if typeof(data) is 'object' and data.toCSV? 
+          return data.toCSV (error, str) =>
+            @pushData dataset, append, str, callback 
+
     req = 
       method: 'PUT'
       uri: "https://api.domo.com/v1/datasets/#{id}/data"
       qs:
-        append: options.append
+        append: append
+      contentType: 'text/csv'
       headers:
+        'content-type': 'text/csv'
         accept: 'text/csv'
+      body: data
 
     @request req, (error, response, body) =>
       if error then return callback error, response, body
       callback error, response, body
 
+  # Append to dataset shortcut for code readability
+  appendData: (id, data, callback) ->
+    @pushData id, true, data, callback
+
+  # Replace dataset shortcut
+  replaceData: (id, data, callback) ->
+    @pushData id, false, data, callback
 
 
 # Prototype class for storing dataset metadata
@@ -156,11 +182,12 @@ class DomoDataClient extends DomoClient
 #   createdAt String  An ISO-8601 representation of the creation date of the DataSet
 #   updatedAt String  AN ISO-8601 representation of the time the DataSet was last updated
 #   links Array Referential links to the DataSet
-class DomoDataSetMetaData
+class DomoDataSet
   # Fields you can edit
   @EDITABLE_FIELDS = ['name', 'description', 'schema']
 
   constructor: (options={}) ->
+    @_data = []
     # options.id ?= null
     # options.name ?= null
     # options.schema ?= null
@@ -179,13 +206,42 @@ class DomoDataSetMetaData
   # Return the fields that are editable 
   getFieldsObject: ->
     fields = {}
-    for field in DomoDataSetMetaData.EDITABLE_FIELDS
+    for field in DomoDataSet.EDITABLE_FIELDS
       if @[field]?
         fields[field] = @[field]
     fields
 
+  # Return the dataset as an array of rows, with or without headers
+  getData: (headers=true) ->
+    if headers
+      [@getColumnHeaders()].concat(@_data)
+    else 
+      @_data
+  
+  # Append a string containing CSV data to our dataset
+  appendCSV: (str, callback) ->
+    csv.parse str, (error, rows) =>
+      unless error
+        @_data = @_data.concat(rows)
+      callback error, rows, @
+
+  # Replace our data with parsed CSV string
+  importCSV: (str, callback) ->
+    csv.parse str, (error, rows) =>
+      unless error
+        @_data = rows
+      callback error, rows, @
+
+  # Stringify our data as a csv
+  toCSV: (headers, callback) ->
+    if typeof headers is 'function'
+      callback = headers
+      headers = false
+    csv.stringify @getData(headers), callback
+
+
 # Export our module goodies
 module.exports = 
   DataClient: DomoDataClient
-  DataSetMetaData: DomoDataSetMetaData
+  DataSet: DomoDataSet
   COLUMN_TYPES: DOMO_COLUMN_TYPES

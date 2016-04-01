@@ -3,16 +3,6 @@ domonodo
 
 `domonodo` is a work-in-progress library for working with Domo.com's User and Data APIs.
 
-## Version
-
-0.0.6 - Improvements to DataSetMetaData wrapper and DataClient argument flexibility
-
-0.0.3 - CSV/JSON parse bugfix
-
-0.0.2 - Implemented Domo's Data APIs and did some preliminary testing on most of the functions
-
-0.0.1 - Implemented basic Authorization and User APIs
-
 ## Installation
 
     npm install domonodo
@@ -54,6 +44,18 @@ domonodo
 	    	});
 	    });
 	});
+
+## Version History
+
+0.0.7 - Extra DataSet and DataClient helpers
+
+0.0.6 - Improvements to DataSetMetaData wrapper and DataClient argument flexibility
+
+0.0.3 - CSV/JSON parse bugfix
+
+0.0.2 - Implemented Domo's Data APIs and did some preliminary testing on most of the functions
+
+0.0.1 - Implemented basic Authorization and User APIs
 
 ## Credits
 
